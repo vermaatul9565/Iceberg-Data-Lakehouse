@@ -1,0 +1,50 @@
+x-iceberg-common:
+  &iceberg-common
+  build: .
+  env_file:
+    - .env
+
+services:
+  spark-iceberg:
+    <<: *iceberg-common
+    image: tabulario/spark-iceberg
+    container_name: spark-iceberg
+    environment:
+      - PYTHONPATH=/home/iceberg:/home/iceberg
+      - SPARK_CONF_SPARK_UI_PORT=4041
+      - PYSPARK_SUBMIT_ARGS=--packages org.apache.iceberg:iceberg-spark-runtime-3.4_2.12:1.8.1,org.apache.iceberg:iceberg-aws-bundle:1.8.1,org.apache.hadoop:hadoop-aws:3.3.2,com.amazonaws:aws-java-sdk-bundle:1.11.1026 --exclude-packages org.wildfly.openssl:wildfly-openssl --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem pyspark-shell
+    build: spark/
+    networks:
+      iceberg_net:
+    depends_on:
+      - rest
+    volumes:
+      - ./warehouse:/home/iceberg/warehouse
+      - ./notebooks:/home/iceberg/notebooks/notebooks
+      - ./config:/home/iceberg/config
+      - ./spark-defaults.conf:/opt/spark/conf/spark-defaults.conf
+      - ./hadoop-metrics2-s3a-file-system.properties:/opt/spark/conf/hadoop-metrics2-s3a-file-system.properties
+      - ./hadoop-metrics2.properties:/opt/spark/conf/hadoop-metrics2.properties
+      - ivy-cache:/root/.ivy2
+
+    ports:
+      - 8888:8888
+      - 8080:8080
+      - 4041:4041
+      - 10000:10000
+      - 10001:10001
+  rest:
+    <<: *iceberg-common
+    image: apache/iceberg-rest-fixture
+    container_name: iceberg-rest
+    networks:
+      iceberg_net:
+    ports:
+      - 8181:8181
+
+
+networks:
+  iceberg_net:
+
+volumes:
+  ivy-cache:
