@@ -1,5 +1,11 @@
 .env
+.venv
+.dist
 .ipynb_checkpoints
 metastore_db
 __pycache__
 weatherhistory_csv
+.vscode
+workbook
+.DS_Store
+
