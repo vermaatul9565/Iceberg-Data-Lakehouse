@@ -2,6 +2,8 @@
 
 A comprehensive data lakehouse solution using Apache Iceberg, Spark, and Docker for efficient data engineering and analytics workflows.
 
+![Alt text](images/lakehouse-design.png)
+
 ## 🏗️ Architecture
 
 This project implements a modern data lakehouse architecture with:
